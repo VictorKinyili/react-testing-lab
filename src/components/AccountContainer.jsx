@@ -8,11 +8,6 @@ function AccountContainer() {
   const [transactions,setTransactions] = useState([])
   const [search,setSearch] = useState("")
 
-  const filteredTransactions = transactions.filter(transaction =>
-    transaction.description.toLowerCase().includes(search.toLowerCase())
-  );
-
-
   useEffect(()=>{
     fetch("http://localhost:6001/transactions")
     .then(r=>r.json())
@@ -28,23 +23,27 @@ function AccountContainer() {
       body: JSON.stringify(newTransaction)
     })
     .then(r=>r.json())
-    .then(data=>setTransactions([...transactions,data]))
+    .then(data=>setTransactions(current => [...current,data]))
   }
   
-  // Sort function here
   function onSort(sortBy){
-    
+    setTransactions(current =>
+      [...current].sort((a,b) =>
+        String(a[sortBy]).localeCompare(String(b[sortBy]), undefined, {sensitivity: "base"})
+      )
+    )
   }
 
-  // Filter using search here and pass new variable down
-  
+  const filteredTransactions = transactions.filter(transaction =>
+    transaction.description.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div>
-      <Search setSearch={setSearch}/>
+      <Search search={search} onSearchChange={setSearch}/>
       <AddTransactionForm postTransaction={postTransaction}/>
       <Sort onSort={onSort}/>
-      <TransactionsList transactions={transactions} />
+      <TransactionsList transactions={filteredTransactions} />
     </div>
   );
 }
