@@ -7,7 +7,11 @@ import Sort from "./Sort";
 function AccountContainer() {
   const [transactions,setTransactions] = useState([])
   const [search,setSearch] = useState("")
-  // console.log(search)
+
+  const filteredTransactions = transactions.filter(transaction =>
+    transaction.description.toLowerCase().includes(search.toLowerCase())
+  );
+
 
   useEffect(()=>{
     fetch("http://localhost:6001/transactions")
